@@ -1,0 +1,5 @@
+/target/
+/mongo-volume/
+
+### IntelliJ IDEA ###
+/.idea
