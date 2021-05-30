@@ -1,11 +1,11 @@
 package de.kemistheiss.fullfront;
 
-import de.kemistheiss.fullfront.model.Request;
-import de.kemistheiss.fullfront.model.Response;
 import de.kemistheiss.fullfront.person.PersonRepository;
 import de.kemistheiss.fullfront.person.PersonService;
 import de.kemistheiss.fullfront.person.model.Person;
 import de.kemistheiss.fullfront.shame.model.ShamePoint;
+import de.kemistheiss.fullfront.shame.model.ShameRequest;
+import de.kemistheiss.fullfront.shame.model.ShameResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,37 +36,38 @@ public class FullFrontService {
         return personService.filterShamePoints(personList, year, month);
     }
 
-    public Response postShamePoint(Request request) {
-        Optional<Person> person = personRepository.findByName(request.getPersonName());
+    public ShameResponse postShamePoint(ShameRequest shameRequest) {
+        Optional<Person> person = personRepository.findByName(shameRequest.getPersonName());
 
-        return addShamePointToPersonAndSave(person, request);
+        return addShamePointToPersonAndSave(person, shameRequest);
     }
 
-    private Response addShamePointToPersonAndSave(Optional<Person> optionalPerson, Request request) {
-        ShamePoint newShamePoint = createShamePointFromRequest(request);
-        Person person = new Person();
-
-        if (optionalPerson.isPresent()) {
-            person = optionalPerson.get();
-        } else {
-           createNewPerson(person, request.getPersonName());
-        }
+    private ShameResponse addShamePointToPersonAndSave(Optional<Person> optionalPerson, ShameRequest shameRequest) {
+        ShamePoint newShamePoint = createShamePointFromRequest(shameRequest);
+        Person person = getOptionalOrCreateNewPerson(optionalPerson, shameRequest);
 
         saveShamePointToPerson(person, newShamePoint);
 
-        return new Response(person.getName(), newShamePoint.getDate());
+        return new ShameResponse(person.getName(), newShamePoint.getDate());
     }
 
-    private ShamePoint createShamePointFromRequest(Request request) {
+    private Person getOptionalOrCreateNewPerson(Optional<Person> optionalPerson, ShameRequest shameRequest) {
+        return optionalPerson.orElseGet(() -> createNewPerson(shameRequest.getPersonName()));
+    }
+
+    private ShamePoint createShamePointFromRequest(ShameRequest shameRequest) {
         ShamePoint shamePoint = new ShamePoint();
         shamePoint.setDate(LocalDate.now());
 
         return shamePoint;
     }
 
-    private void createNewPerson(Person person, String personName) {
-        person.setName(personName);
-        person.setShamePoints(new ArrayList<>());
+    private Person createNewPerson(String personName) {
+        Person newPerson = new Person();
+        newPerson.setName(personName);
+        newPerson.setShamePoints(new ArrayList<>());
+
+        return newPerson;
     }
 
     private void saveShamePointToPerson(Person person, ShamePoint shamePoint) {

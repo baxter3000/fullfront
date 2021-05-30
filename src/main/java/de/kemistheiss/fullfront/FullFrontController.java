@@ -1,10 +1,8 @@
 package de.kemistheiss.fullfront;
 
-import de.kemistheiss.fullfront.model.Request;
-import de.kemistheiss.fullfront.model.Response;
+import de.kemistheiss.fullfront.shame.model.ShameRequest;
+import de.kemistheiss.fullfront.shame.model.ShameResponse;
 import de.kemistheiss.fullfront.person.model.Person;
-import de.kemistheiss.fullfront.shame.model.ShamePoint;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -31,8 +29,8 @@ public class FullFrontController implements FullFrontApi {
     }
 
     @Override
-    public Response postShamePoint(Request request) {
-        return fullFrontService.postShamePoint(request);
+    public ShameResponse postShamePoint(ShameRequest shameRequest) {
+        return fullFrontService.postShamePoint(shameRequest);
     }
 
 }
